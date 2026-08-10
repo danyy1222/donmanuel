@@ -1,7 +1,12 @@
-# Sistema Tienda
+# Tienda Don Manuel
 
-Punto de venta para verdulería y almacén, hecho para usarse **desde el celular**.
-Funciona sin internet: los datos se guardan dentro del propio teléfono.
+Punto de venta para verdulería y abarrotes, hecho para usarse **desde el
+celular**. Funciona sin internet: los datos se guardan dentro del propio
+teléfono.
+
+Configurado para **Perú**: soles con dos decimales, punto como separador
+decimal, sugerencias de pago con los billetes locales y productos de ejemplo
+con nombres y precios de mercado peruano.
 
 ## Cómo probarlo ahora
 
@@ -14,8 +19,8 @@ Se abre en `http://localhost:5173`. La consola también muestra una dirección
 tipo `http://192.168.1.42:5173`: esa es la que tenés que abrir **desde el
 celular**, con el teléfono conectado al mismo wifi que la computadora.
 
-Viene con 33 productos de ejemplo cargados (verduras, frutas, almacén, bebidas
-y limpieza) para poder probarlo sin cargar nada.
+Viene con productos de ejemplo cargados (verduras, frutas, abarrotes, bebidas y
+limpieza) para poder probarlo sin cargar nada.
 
 ## Instalarlo en el celular (APK de Android)
 
@@ -148,9 +153,19 @@ scripts/
   iconos.mjs   genera los PNG del manifest desde public/icono.svg
 ```
 
+## Comprobantes oficiales (SUNAT)
+
+Las boletas que emite la app son **documentos no fiscales**: sirven como
+comprobante para el cliente y como registro propio, pero no reemplazan una
+boleta de venta oficial.
+
+En [FACTURACION-PERU.md](FACTURACION-PERU.md) está la investigación completa:
+qué trámites hacen falta, los cuatro caminos posibles con sus costos, y por qué
+el Nuevo RUS **no está obligado** a emitir electrónicamente.
+
 ## Lo que todavía no está
 
 Ver [PLAN.md](PLAN.md) para el detalle. En resumen: merma y ajustes de stock,
 apertura y cierre de caja, cambio rápido de precios por categoría, fiado con
-cuenta corriente, proveedores y compras, reportes de ganancia, usuarios con PIN
-e impresión en térmica bluetooth.
+cuenta corriente, proveedores y compras, reportes de ganancia e impresión en
+térmica bluetooth.

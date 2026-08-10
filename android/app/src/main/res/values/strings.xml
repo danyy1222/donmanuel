@@ -1,7 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Sistema Tienda</string>
-    <string name="title_activity_main">Sistema Tienda</string>
+    <!--
+      Este archivo lo genera Capacitor al crear el proyecto Android, pero no lo
+      vuelve a tocar en cada `cap sync`. Si cambia el nombre de la app en
+      capacitor.config.ts, hay que actualizarlo también acá o el ícono del
+      celular sigue mostrando el nombre viejo.
+    -->
+    <string name="app_name">Tienda Don Manuel</string>
+    <string name="title_activity_main">Tienda Don Manuel</string>
     <string name="package_name">com.tienda.sistema</string>
     <string name="custom_url_scheme">com.tienda.sistema</string>
 </resources>
