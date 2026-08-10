@@ -1,7 +1,9 @@
+import { SEPARADOR_DECIMAL } from '../lib/formato'
+
 interface Props {
   onTecla: (t: string) => void
   onBorrar: () => void
-  /** Oculta la coma cuando solo se admiten enteros (unidades, atados). */
+  /** Oculta el punto decimal cuando solo se admiten enteros (unidades, atados). */
   conComa?: boolean
 }
 
@@ -11,7 +13,7 @@ interface Props {
  * tamaño según el celular.
  */
 export function Teclado({ onTecla, onBorrar, conComa = true }: Props) {
-  const teclas = ['1', '2', '3', '4', '5', '6', '7', '8', '9', conComa ? ',' : '', '0', '⌫']
+  const teclas = ['1', '2', '3', '4', '5', '6', '7', '8', '9', conComa ? SEPARADOR_DECIMAL : '', '0', '⌫']
 
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -34,18 +36,18 @@ export function Teclado({ onTecla, onBorrar, conComa = true }: Props) {
 
 /** Aplica una tecla sobre el texto actual, cuidando que quede un número válido. */
 export function aplicarTecla(actual: string, tecla: string, conComa: boolean): string {
-  if (tecla === ',') {
-    if (!conComa || actual.includes(',')) return actual
-    return actual === '' ? '0,' : `${actual},`
+  if (tecla === SEPARADOR_DECIMAL) {
+    if (!conComa || actual.includes(SEPARADOR_DECIMAL)) return actual
+    return actual === '' ? `0${SEPARADOR_DECIMAL}` : `${actual}${SEPARADOR_DECIMAL}`
   }
   // Máximo 3 decimales: es lo que muestra una balanza (gramos).
-  const [, dec] = actual.split(',')
+  const [, dec] = actual.split(SEPARADOR_DECIMAL)
   if (dec !== undefined && dec.length >= 3) return actual
   if (actual === '0') return tecla
   return actual + tecla
 }
 
 export function aNumero(texto: string): number {
-  const n = parseFloat(texto.replace(',', '.'))
+  const n = parseFloat(texto)
   return Number.isFinite(n) ? n : 0
 }

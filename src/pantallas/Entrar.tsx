@@ -105,7 +105,7 @@ function PedirPin({
   }, [pin, usuario, onEntrar])
 
   return (
-    <Marco titulo={`Hola, ${usuario.nombre}`} subtitulo="Poné tu PIN para entrar">
+    <Marco titulo={`Hola, ${usuario.nombre}`} subtitulo="Pon tu PIN para entrar">
       <div className="mb-6 flex justify-center gap-3">
         {Array.from({ length: LARGO_PIN }, (_, i) => (
           <span
@@ -146,7 +146,7 @@ function PrimerUso({ onListo }: { onListo: (s: Sesion) => void }) {
   const [error, setError] = useState('')
 
   const crear = async () => {
-    if (nombre.trim().length < 2) return setError('Poné tu nombre')
+    if (nombre.trim().length < 2) return setError('Escribe tu nombre')
     if (pin.length !== LARGO_PIN) return setError(`El PIN tiene que ser de ${LARGO_PIN} números`)
     if (pin !== repetir) return setError('Los dos PIN no coinciden')
 
@@ -157,7 +157,7 @@ function PrimerUso({ onListo }: { onListo: (s: Sesion) => void }) {
   }
 
   return (
-    <Marco titulo="Bienvenido" subtitulo="Creá tu usuario de dueño para empezar">
+    <Marco titulo="Bienvenido" subtitulo="Crea tu usuario de dueño para empezar">
       <div className="space-y-4 rounded-2xl bg-white p-4">
         <Campo etiqueta="Tu nombre" valor={nombre} onCambio={setNombre} placeholder="Juan" requerido />
         <Campo
@@ -169,7 +169,7 @@ function PrimerUso({ onListo }: { onListo: (s: Sesion) => void }) {
           requerido
         />
         <Campo
-          etiqueta="Repetí el PIN"
+          etiqueta="Repite el PIN"
           valor={repetir}
           onCambio={(v) => setRepetir(v.replace(/\D/g, '').slice(0, LARGO_PIN))}
           tipo="password"
@@ -184,7 +184,7 @@ function PrimerUso({ onListo }: { onListo: (s: Sesion) => void }) {
         </Boton>
 
         <p className="text-center text-xs text-slate-500">
-          Como dueño vas a ver los costos, las ganancias y la configuración. Después podés crear
+          Como dueño vas a ver los costos, las ganancias y la configuración. Después puedes crear
           usuarios de cajero, que solo pueden vender.
         </p>
       </div>

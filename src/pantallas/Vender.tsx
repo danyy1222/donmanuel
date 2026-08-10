@@ -139,7 +139,7 @@ export function Vender({ sesion, onVentaLista, onAviso }: Props) {
         pausado={camaraPausada || modo !== 'escanear'}
         oculto={modo !== 'escanear'}
         onSinCamara={(motivo) => {
-          onAviso(`${motivo}. Buscá los productos en la lista.`)
+          onAviso(`${motivo}. Busca los productos en la lista.`)
           setModo('buscar')
         }}
       />
@@ -209,7 +209,7 @@ export function Vender({ sesion, onVentaLista, onAviso }: Props) {
       ) : (
         <div className="flex-1 overflow-y-auto">
           {carrito.length === 0 ? (
-            <Vacio icono="🛒" texto="Escaneá un producto para empezar" />
+            <Vacio icono="🛒" texto="Escanea un producto para empezar" />
           ) : (
             <>
               {carrito.map((item, i) => (

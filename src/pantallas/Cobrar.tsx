@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Boton, CampoNumero, Hoja } from '../componentes/UI'
 import { Teclado, aNumero, aplicarTecla } from '../componentes/Teclado'
 import type { MetodoPago } from '../db/db'
-import { plata } from '../lib/formato'
+import { plata, SIMBOLO } from '../lib/formato'
 import { sugerirPagos } from '../lib/pagos'
 
 interface Props {
@@ -125,7 +125,7 @@ export function Cobrar({ abierto, total, onCerrar, onConfirmar }: Props) {
               etiqueta="Cuánto se le descuenta"
               valor={descuento}
               onCambio={setDescuento}
-              prefijo="$"
+              prefijo={SIMBOLO}
               placeholder="0"
             />
           </div>

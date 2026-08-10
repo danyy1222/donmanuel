@@ -59,7 +59,7 @@ export function CapturarCodigo({ abierto, onCerrar, onCodigo, productoId }: Prop
           </p>
         ) : (
           <p className="mt-4 text-center text-sm text-slate-500">
-            Apuntá al código de barras del envase
+            Apunta al código de barras del envase
           </p>
         )}
       </div>

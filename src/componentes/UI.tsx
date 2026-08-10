@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { SEPARADOR_DECIMAL } from '../lib/formato'
 
 interface BotonProps {
   children: ReactNode
@@ -169,17 +170,19 @@ export function CampoNumero({
   }, [valor])
 
   const escribir = (bruto: string) => {
-    let limpio = bruto.replace(/[^\d.,]/g, '').replace(/\./g, ',')
+    // Se acepta coma y se la convierte: el teclado del celular la ofrece, pero
+    // en Perú el separador decimal es el punto.
+    let limpio = bruto.replace(/[^\d.,]/g, '').replace(/,/g, SEPARADOR_DECIMAL)
 
     // Un solo separador: los de más se descartan.
-    const partes = limpio.split(',')
-    if (partes.length > 2) limpio = `${partes[0]},${partes.slice(1).join('')}`
+    const partes = limpio.split(SEPARADOR_DECIMAL)
+    if (partes.length > 2) limpio = `${partes[0]}${SEPARADOR_DECIMAL}${partes.slice(1).join('')}`
 
-    const [entera, decimal] = limpio.split(',')
+    const [entera, decimal] = limpio.split(SEPARADOR_DECIMAL)
     if (decimales === 0) {
       limpio = entera
     } else if (decimal !== undefined && decimal.length > decimales) {
-      limpio = `${entera},${decimal.slice(0, decimales)}`
+      limpio = `${entera}${SEPARADOR_DECIMAL}${decimal.slice(0, decimales)}`
     }
 
     setTexto(limpio)
@@ -210,11 +213,11 @@ export function CampoNumero({
 
 /** 0 se muestra vacío: un "0" fijo obliga a borrarlo antes de escribir. */
 function aTexto(n: number): string {
-  return n ? String(n).replace('.', ',') : ''
+  return n ? String(n) : ''
 }
 
 function aNumeroSuelto(texto: string): number {
-  const n = parseFloat(texto.replace(',', '.'))
+  const n = parseFloat(texto)
   return Number.isFinite(n) ? n : 0
 }
 

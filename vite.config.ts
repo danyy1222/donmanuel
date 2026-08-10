@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icono.svg'],
       manifest: {
-        name: 'Sistema Tienda',
-        short_name: 'Tienda',
-        description: 'Punto de venta para verdulería y almacén',
+        name: 'Tienda Don Manuel',
+        short_name: 'Don Manuel',
+        description: 'Punto de venta para verdulería y abarrotes',
         theme_color: '#15803d',
         background_color: '#ffffff',
         display: 'standalone',

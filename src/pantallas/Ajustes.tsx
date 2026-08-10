@@ -90,7 +90,7 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
         <h2 className="mb-1 font-bold">Respaldo</h2>
         <p className="mb-4 text-sm text-slate-500">
           Los datos viven dentro de este celular. Si se pierde o se formatea sin respaldo, se pierde
-          todo. Guardá una copia seguido.
+          todo. Guarda una copia seguido.
         </p>
         <div className="grid grid-cols-2 gap-3">
           <Boton tipo="secundario" onClick={() => exportar(onAviso)}>
@@ -138,7 +138,7 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
       </Boton>
 
       <p className="pb-4 text-center text-xs text-slate-400">
-        {productos} productos activos · Sistema Tienda v1
+        {productos} productos activos · Tienda Don Manuel
       </p>
     </div>
   )

@@ -17,7 +17,7 @@ export function Boletas({ onAviso }: { onAviso: (t: string) => void }) {
     return (
       <Vacio
         icono="🧾"
-        texto="Todavía no creaste ninguna boleta. Cuando un cliente pida comprobante, tocá «Crear boleta» al terminar la venta."
+        texto="Todavía no has creado ninguna boleta. Cuando un cliente pida comprobante, toca «Crear boleta» al terminar la venta."
       />
     )
   }

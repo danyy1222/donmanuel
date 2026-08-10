@@ -197,7 +197,7 @@ export function AccionesBoleta({ boleta, onAviso, onListo }: AccionesProps) {
     onAviso(
       r.via === 'compartir'
         ? 'Boleta lista para enviar'
-        : 'PDF descargado. Adjuntalo en el chat de WhatsApp que se abrió.',
+        : 'PDF descargado. Adjúntalo en el chat de WhatsApp que se abrió.',
     )
     onListo?.()
   }
@@ -243,7 +243,7 @@ export function AccionesBoleta({ boleta, onAviso, onListo }: AccionesProps) {
 
       <p className="px-1 text-center text-xs text-slate-500">
         WhatsApp pide que la persona confirme el envío. El sistema deja la boleta adjunta y el
-        mensaje escrito: solo falta tocar enviar.
+        mensaje escrito: solo falta tocar el botón de enviar.
       </p>
     </div>
   )

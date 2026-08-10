@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Producto, VentaItem } from '../db/db'
-import { kilos, plata } from '../lib/formato'
+import { kilos, plata, SIMBOLO } from '../lib/formato'
 import { Boton, Hoja } from './UI'
 import { Teclado, aNumero, aplicarTecla } from './Teclado'
 
@@ -59,7 +59,7 @@ export function CargarItem({ producto, onCerrar, onAgregar }: Props) {
             {(
               [
                 ['peso', 'Por peso'],
-                ['plata', 'Por plata'],
+                ['plata', 'Por monto'],
               ] as const
             ).map(([m, etiqueta]) => (
               <button
@@ -80,7 +80,7 @@ export function CargarItem({ producto, onCerrar, onAgregar }: Props) {
 
         <div className="rounded-xl border-2 border-marca-200 bg-marca-50 px-4 py-5 text-center">
           <div className="text-4xl font-bold tabular-nums text-slate-900">
-            {porPeso && modo === 'plata' ? '$' : ''}
+            {porPeso && modo === 'plata' ? `${SIMBOLO} ` : ''}
             {texto || '0'}
             {conComa ? ' kg' : ''}
           </div>
@@ -90,8 +90,8 @@ export function CargarItem({ producto, onCerrar, onAgregar }: Props) {
                 ? `Pesar ${kilos(cantidad)}`
                 : `= ${plata(subtotal)}`
               : porPeso && modo === 'plata'
-                ? 'Escribí cuánta plata lleva'
-                : 'Escribí la cantidad'}
+                ? 'Escribe cuánto va a llevar'
+                : 'Escribe la cantidad'}
           </div>
         </div>
 

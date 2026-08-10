@@ -4,7 +4,7 @@ import { CapturarCodigo } from '../componentes/CapturarCodigo'
 import { FotoProducto } from '../componentes/FotoProducto'
 import { Boton, Campo, CampoNumero, Hoja, Vacio } from '../componentes/UI'
 import { db, guardarFoto, type Producto, type TipoVenta } from '../db/db'
-import { normalizar, plata } from '../lib/formato'
+import { normalizar, plata, SIMBOLO } from '../lib/formato'
 import { achicarFoto } from '../lib/imagen'
 import { puede, type Sesion } from '../lib/usuarios'
 
@@ -124,7 +124,7 @@ function EditorProducto({ producto, categorias, verCostos, onCerrar, onAviso }: 
 
   const guardar = async () => {
     if (!actual.nombre.trim()) {
-      onAviso('Poné un nombre al producto')
+      onAviso('Escribe un nombre para el producto')
       return
     }
     const esNuevo = actual.id === undefined
@@ -194,7 +194,7 @@ function EditorProducto({ producto, categorias, verCostos, onCerrar, onAviso }: 
             etiqueta={actual.tipoVenta === 'peso' ? 'Precio por kilo' : 'Precio de venta'}
             valor={actual.precioVenta}
             onCambio={(n) => set('precioVenta', n)}
-            prefijo="$"
+            prefijo={SIMBOLO}
             placeholder="0"
           />
           {verCostos && (
@@ -202,7 +202,7 @@ function EditorProducto({ producto, categorias, verCostos, onCerrar, onAviso }: 
               etiqueta="Precio de costo"
               valor={actual.precioCosto}
               onCambio={(n) => set('precioCosto', n)}
-              prefijo="$"
+              prefijo={SIMBOLO}
               placeholder="0"
             />
           )}
@@ -214,7 +214,7 @@ function EditorProducto({ producto, categorias, verCostos, onCerrar, onAviso }: 
               ganancia > 0 ? 'bg-marca-50 text-marca-800' : 'bg-red-50 text-red-700'
             }`}
           >
-            Ganás <strong>{plata(ganancia)}</strong> por {actual.tipoVenta === 'peso' ? 'kilo' : 'unidad'} ·{' '}
+            Ganas <strong>{plata(ganancia)}</strong> por {actual.tipoVenta === 'peso' ? 'kilo' : 'unidad'} ·{' '}
             <strong>{margen.toFixed(0)}%</strong> sobre el costo
           </div>
         )}

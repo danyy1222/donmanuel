@@ -47,7 +47,7 @@ export function Usuarios({ sesion, onAviso }: Props) {
               <div className="truncate font-medium">
                 {u.nombre}
                 {u.id === sesion.usuario.id && (
-                  <span className="ml-2 text-xs font-normal text-slate-400">(vos)</span>
+                  <span className="ml-2 text-xs font-normal text-slate-400">(tú)</span>
                 )}
               </div>
               <div className="text-xs text-slate-500 capitalize">
@@ -94,7 +94,7 @@ function EditorUsuario({
   const soloDigitos = (v: string) => v.replace(/\D/g, '').slice(0, LARGO_PIN)
 
   const guardar = async () => {
-    if (nombre.trim().length < 2) return setError('Poné un nombre')
+    if (nombre.trim().length < 2) return setError('Pon un nombre')
 
     // En un usuario nuevo el PIN es obligatorio; al editar, solo si se quiere cambiar.
     if (esNuevo || pin) {
@@ -110,7 +110,7 @@ function EditorUsuario({
       // Bajar de rol al último dueño dejaría el sistema sin nadie que pueda
       // entrar a la configuración.
       if (usuario!.rol === 'dueño' && rol !== 'dueño' && (await esUltimoDueño(id))) {
-        return setError('Es el único dueño. Creá otro dueño antes de cambiarle el rol.')
+        return setError('Es el único dueño. Crea otro dueño antes de cambiarle el rol.')
       }
       await db.usuarios.update(id, { nombre: nombre.trim(), rol })
       if (pin) await cambiarPin(id, pin)
@@ -121,7 +121,7 @@ function EditorUsuario({
 
   const darDeBaja = async () => {
     const id = usuario!.id!
-    if (id === sesion.usuario.id) return setError('No podés darte de baja a vos mismo')
+    if (id === sesion.usuario.id) return setError('No puedes darte de baja a ti mismo')
     if (await esUltimoDueño(id)) return setError('Es el único dueño, no se puede dar de baja')
     await db.usuarios.update(id, { activo: 0 })
     onAviso(`${usuario!.nombre} dado de baja`)
@@ -166,7 +166,7 @@ function EditorUsuario({
         />
         {(esNuevo || pin) && (
           <Campo
-            etiqueta="Repetí el PIN"
+            etiqueta="Repite el PIN"
             valor={repetir}
             onCambio={(v) => setRepetir(soloDigitos(v))}
             tipo="password"

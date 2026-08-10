@@ -90,7 +90,7 @@ export function VisorCamara({ onCodigo, pausado, oculto, onSinCamara }: Props) {
         <div className="flex h-40 flex-col items-center justify-center gap-3 bg-slate-800 px-6 text-center">
           <span className="text-3xl">📷</span>
           <p className="text-sm text-slate-300">
-            No se puede usar la cámara. Cargá los productos desde la lista.
+            No se puede usar la cámara. Carga los productos desde la lista.
           </p>
           <button
             onClick={() => {
@@ -124,7 +124,7 @@ export function VisorCamara({ onCodigo, pausado, oculto, onSinCamara }: Props) {
             ? 'Abriendo la cámara...'
             : pausado
               ? 'Escaneo en pausa'
-              : 'Apuntá al código de barras'}
+              : 'Apunta al código de barras'}
         </span>
       </div>
     </div>
