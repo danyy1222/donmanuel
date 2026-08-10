@@ -1,0 +1,33 @@
+# Dependencias: se reinstalan con `npm install`
+node_modules/
+
+# Compilado de la web: se regenera con `npm run build`
+dist/
+dist-ssr/
+*.local
+tsconfig.tsbuildinfo
+
+# Compilado de Android: se regenera con `npm run apk`
+android/app/build/
+android/build/
+android/.gradle/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/res/xml/config.xml
+
+# Rutas del SDK propias de cada computadora
+android/local.properties
+
+# El APK pesa 4,5 MB y se regenera; no tiene sentido versionarlo
+*.apk
+
+# Vistas previas generadas por los scripts de íconos
+icono-preview.png
+
+# Respaldos de la app: pueden tener datos de clientes
+respaldo-tienda-*.json
+
+.DS_Store
+*.log
+.env
+.env.local

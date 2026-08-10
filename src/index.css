@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-marca-50: #f0fdf4;
+  --color-marca-100: #dcfce7;
+  --color-marca-200: #bbf7d0;
+  --color-marca-500: #22c55e;
+  --color-marca-600: #16a34a;
+  --color-marca-700: #15803d;
+  --color-marca-800: #166534;
+}
+
+html {
+  /* Evita el zoom por doble toque en los botones del mostrador. */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-slate-100 text-slate-900 antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* Los inputs de menos de 16px hacen que iOS acerque la pantalla al enfocarlos. */
+input,
+select,
+textarea,
+button {
+  font-size: 16px;
+}
+
+/* Las flechitas de los number rompen el diseño y no sirven con el pulgar. */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+@utility area-segura-abajo {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/*
+ * Reserva el alto de la barra de estado (hora, batería, notificaciones).
+ * En Android 15 la app va a pantalla completa sí o sí y sin esto el contenido
+ * queda debajo de los íconos del sistema.
+ */
+@utility area-segura-arriba {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@utility area-segura-lados {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}

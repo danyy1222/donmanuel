@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Sistema Tienda</string>
+    <string name="title_activity_main">Sistema Tienda</string>
+    <string name="package_name">com.tienda.sistema</string>
+    <string name="custom_url_scheme">com.tienda.sistema</string>
+</resources>
