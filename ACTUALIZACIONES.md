@@ -1,3 +1,60 @@
+# Actualizaciones
+
+> **Estado: el Nivel 1 está hecho y funcionando.** La app avisa sola cuando hay
+> una versión nueva. El Nivel 2 (que se actualice sin reinstalar) sigue
+> pendiente.
+
+## Cómo publicar una actualización
+
+Tres pasos, y el orden importa: el aviso tiene que salir cuando el archivo ya
+está disponible para descargar.
+
+**1. Subir el número de versión** en `package.json`:
+
+```json
+"version": "1.2.0"
+```
+
+**2. Generar el APK y publicarlo**
+
+```bash
+npm run apk
+```
+
+Subir `sistema-tienda.apk` a un **Release** en GitHub:
+`https://github.com/danyy1222/donmanuel/releases/new`
+Poner el mismo número de versión como etiqueta (por ejemplo `v1.2.0`) y
+adjuntar el archivo.
+
+**3. Recién ahora, avisar.** Editar `version.json` con el número nuevo y una
+línea contando qué cambió, y subirlo:
+
+```json
+{
+  "version": "1.2.0",
+  "novedades": "Ahora se puede anotar la merma de verduras.",
+  "descarga": "https://github.com/danyy1222/donmanuel/releases/latest"
+}
+```
+
+```bash
+git add -A && git commit -m "Versión 1.2.0" && git push
+```
+
+Los celulares lo ven en la próxima apertura de la app (revisa como mucho una
+vez por hora).
+
+### Qué NO hacer
+
+**No subas `version.json` antes que el APK.** El aviso saldría con un enlace de
+descarga que todavía no existe.
+
+**No repitas un número de versión.** Si ya publicaste la `1.2.0` y le cambiás
+el contenido, los celulares que ya la vieron no se enteran: la comparación es
+por número.
+
+---
+
 # Cómo mandar actualizaciones sin gastar dinero
 
 El problema: la app se instala pasando un archivo APK. Cuando le agrego algo,

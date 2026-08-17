@@ -165,14 +165,14 @@ function RevisarActualizacion({ onAviso }: { onAviso: (t: string) => void }) {
     const r = await buscarActualizacion(true)
     setBuscando(false)
     if (r) setEncontrada(r)
-    else onAviso('Ya tenés la última versión')
+    else onAviso('Ya tienes la última versión')
   }
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4">
       <h2 className="mb-1 font-bold">Actualizaciones</h2>
       <p className="mb-4 text-sm text-slate-500">
-        La app revisa sola al abrirse. Acá podés revisar cuando quieras.
+        La app revisa sola al abrirse. Acá puedes revisar cuando quieras.
       </p>
 
       {encontrada ? (

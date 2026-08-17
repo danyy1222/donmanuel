@@ -39,7 +39,7 @@ export function AvisoActualizacion({ activo }: { activo: boolean }) {
         <div className="rounded-xl bg-marca-50 px-4 py-5 text-center">
           <div className="text-4xl">🎉</div>
           <div className="mt-2 text-sm text-slate-500">
-            Tenés la {VERSION_APP} · sale la {nueva.version}
+            Tienes la {VERSION_APP} · sale la {nueva.version}
           </div>
         </div>
 
