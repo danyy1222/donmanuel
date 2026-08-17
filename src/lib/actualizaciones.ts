@@ -4,15 +4,22 @@ declare const __VERSION_APP__: string
 export const VERSION_APP = __VERSION_APP__
 
 /**
- * Archivo de versiones publicado en el repositorio. Se lee de raw, que sirve
- * el contenido del archivo sin envolverlo en la página de GitHub.
+ * De dónde se lee el archivo de versiones, en orden de preferencia.
  *
- * Funciona sin contraseña porque el repositorio es público. Si algún día pasa
- * a privado hay que mover este archivo a otro lado (por ejemplo GitHub Pages),
- * porque una clave metida dentro del APK no sería secreta.
+ * Se prueban varias porque `raw.githubusercontent.com` corta con 429 cuando
+ * recibe muchas consultas desde la misma IP, y todos los celulares de una
+ * tienda salen por la misma conexión. jsDelivr es un CDN gratuito que sirve
+ * archivos de repositorios públicos de GitHub sin ese límite; queda primero y
+ * raw como respaldo.
+ *
+ * Las dos funcionan sin contraseña porque el repositorio es público. Si pasara
+ * a privado hay que mover el archivo a otro lado (GitHub Pages, por ejemplo):
+ * una clave metida dentro del APK no sería secreta.
  */
-const URL_VERSIONES =
-  'https://raw.githubusercontent.com/danyy1222/donmanuel/main/version.json'
+const FUENTES = [
+  'https://cdn.jsdelivr.net/gh/danyy1222/donmanuel@main/version.json',
+  'https://raw.githubusercontent.com/danyy1222/donmanuel/main/version.json',
+]
 
 /** Cada cuánto se vuelve a preguntar. Revisar en cada apertura gastaría datos. */
 const CADA = 60 * 60 * 1000 // una hora
@@ -60,13 +67,9 @@ export async function buscarActualizacion(
       if (Date.now() - ultima < CADA) return null
     }
 
-    // Sin caché: si no, el navegador puede devolver la versión vieja del archivo.
-    const respuesta = await fetch(`${URL_VERSIONES}?t=${Date.now()}`, {
-      cache: 'no-store',
-    })
-    if (!respuesta.ok) return null
+    const datos = await leerDeLasFuentes()
+    if (!datos) return null
 
-    const datos = (await respuesta.json()) as Partial<Actualizacion>
     localStorage.setItem(CLAVE_ULTIMA_REVISION, String(Date.now()))
 
     if (!datos.version || !esMasNueva(datos.version, VERSION_APP)) return null
@@ -81,6 +84,30 @@ export async function buscarActualizacion(
     // Sin internet o el archivo mal formado: se reintenta la próxima vez.
     return null
   }
+}
+
+/**
+ * Prueba las fuentes en orden y devuelve la primera que conteste bien.
+ * Si una da 429 o está caída, sigue con la siguiente.
+ */
+async function leerDeLasFuentes(): Promise<Partial<Actualizacion> | null> {
+  for (const fuente of FUENTES) {
+    try {
+      // El parámetro de tiempo evita que el navegador sirva una copia vieja.
+      const respuesta = await fetch(`${fuente}?t=${Date.now()}`, { cache: 'no-store' })
+      if (!respuesta.ok) continue
+
+      // Cuando GitHub corta por exceso de consultas devuelve una página HTML
+      // con estado 200, así que no alcanza con mirar el código de respuesta.
+      const texto = await respuesta.text()
+      if (!texto.trimStart().startsWith('{')) continue
+
+      return JSON.parse(texto) as Partial<Actualizacion>
+    } catch {
+      // Fuente caída o sin señal: se prueba la siguiente.
+    }
+  }
+  return null
 }
 
 /** Deja de avisar por esta versión hasta que salga otra. */
