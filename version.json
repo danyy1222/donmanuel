@@ -1,6 +1,6 @@
 {
   "version": "1.2.0",
   "novedades": "Ahora se pueden borrar todos los productos de una vez, desde Ajustes, para empezar a cargar el catálogo de la tienda sin dar de baja uno por uno.",
-  "descarga": "https://github.com/danyy1222/donmanuel/releases/latest",
-  "_nota": "La app lee este archivo desde raw.githubusercontent.com para saber si hay una versión más nueva que la instalada. Para publicar una actualización: subir el APK a un Release de GitHub, y recién después subir acá el número de version. Al revés, el aviso saldría con un enlace de descarga que todavía no existe."
+  "descarga": "https://github.com/danyy1222/donmanuel/releases/download/v1.2.0/tienda-don-manuel-v1.2.0.apk",
+  "_nota": "La app lee este archivo para saber si hay una versión más nueva que la instalada. 'descarga' apunta al archivo APK directo y no a la página del Release: desde el celular, la página obliga a buscar el archivo entre los Assets. Para publicar: subir el APK a un Release, y recién después subir acá el número de version y la URL del archivo nuevo."
 }
