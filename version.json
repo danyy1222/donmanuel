@@ -1,6 +1,6 @@
 {
-  "version": "1.2.1",
-  "novedades": "Corrige el propio aviso de actualización: si tocabas Descargar pero la instalación no llegaba a completarse, la app nunca volvía a avisar de esa versión.",
-  "descarga": "https://github.com/danyy1222/donmanuel/releases/download/v1.2.1/tienda-don-manuel-v1.2.1.apk",
+  "version": "1.3.0",
+  "novedades": "Ahora cobras por Yape y Plin mostrando tu QR en pantalla, y la caja los separa del efectivo. Se suman el cierre de caja con arqueo, el control de merma y stock, y los reportes de ganancia.",
+  "descarga": "https://github.com/danyy1222/donmanuel/releases/download/v1.3.0/tienda-don-manuel-v1.3.0.apk",
   "_nota": "La app lee este archivo para saber si hay una versión más nueva que la instalada. 'descarga' apunta al archivo APK directo y no a la página del Release: desde el celular, la página obliga a buscar el archivo entre los Assets. Para publicar: subir el APK a un Release, y recién después subir acá el número de version y la URL del archivo nuevo."
 }
