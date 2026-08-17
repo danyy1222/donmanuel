@@ -3,7 +3,12 @@ import Dexie, { type Table } from 'dexie'
 /** Cómo se vende un producto. Define qué se le pide al vendedor al cargarlo. */
 export type TipoVenta = 'unidad' | 'peso' | 'atado'
 
-export type MetodoPago = 'efectivo' | 'tarjeta' | 'transferencia'
+/**
+ * Yape y Plin van separados y no juntos en "transferencia" a propósito: son la
+ * forma de cobro más usada en las bodegas peruanas y cada uno cae en una cuenta
+ * distinta. Mezclarlos hace imposible cuadrar el arqueo contra el celular.
+ */
+export type MetodoPago = 'efectivo' | 'yape' | 'plin' | 'tarjeta' | 'transferencia'
 
 export interface Categoria {
   id?: number
@@ -51,6 +56,12 @@ export interface VentaItem {
   cantidad: number
   precioUnit: number
   subtotal: number
+  /**
+   * Costo del producto el día de la venta. Se congela igual que el precio: la
+   * ganancia de una venta vieja no puede cambiar porque hoy el proveedor
+   * aumentó. Las ventas anteriores a esta versión no lo tienen.
+   */
+  costoUnit?: number
 }
 
 export type Rol = 'dueño' | 'cajero'
@@ -83,7 +94,66 @@ export interface Venta {
   /** Solo se guarda en pagos en efectivo, para poder reconstruir el arqueo. */
   pagoCon?: number
   vuelto?: number
+  /** Turno de caja en el que se cobró. Vacío si se vendió sin caja abierta. */
+  cajaId?: number
   estado: 'completada' | 'anulada'
+}
+
+export type TipoMovStock = 'venta' | 'entrada' | 'merma' | 'ajuste'
+
+/**
+ * Cada entrada y salida de mercadería. Sin esto el stock es un número suelto
+ * que nadie puede explicar: cuando no cuadra, no hay forma de saber si se
+ * vendió, se pudrió o se cargó mal.
+ */
+export interface MovStock {
+  id?: number
+  productoId: number
+  /** Copiado, para que el historial siga legible si el producto se da de baja. */
+  nombre: string
+  fecha: Date
+  tipo: TipoMovStock
+  /** Positiva si entra, negativa si sale. */
+  cantidad: number
+  /** Stock que quedó después del movimiento. */
+  restante: number
+  /** Costo unitario del momento, para poder valorizar la merma en plata. */
+  costoUnit: number
+  motivo?: string
+  usuarioNombre?: string
+  ventaId?: number
+}
+
+/** Un turno de caja: se abre al empezar el día y se cierra al contar la plata. */
+export interface Caja {
+  id?: number
+  abierta: Date
+  cerrada?: Date
+  montoInicial: number
+  /** Efectivo contado a mano al cerrar. */
+  contado?: number
+  /** Contado menos esperado. Negativo significa que falta plata. */
+  diferencia?: number
+  abiertaPor: string
+  cerradaPor?: string
+  estado: 'abierta' | 'cerrada'
+}
+
+/** Plata que entra o sale de la caja sin ser una venta. */
+export interface MovCaja {
+  id?: number
+  cajaId: number
+  fecha: Date
+  tipo: 'ingreso' | 'egreso'
+  monto: number
+  motivo: string
+  usuarioNombre?: string
+}
+
+/** Imágenes sueltas de la tienda (los QR de cobro), fuera de las de productos. */
+export interface Imagen {
+  clave: string
+  blob: Blob
 }
 
 export interface BoletaItem {
@@ -134,6 +204,10 @@ export class TiendaDB extends Dexie {
   usuarios!: Table<Usuario, number>
   fotos!: Table<Foto, number>
   pdfs!: Table<Pdf, number>
+  movStock!: Table<MovStock, number>
+  caja!: Table<Caja, number>
+  movCaja!: Table<MovCaja, number>
+  imagenes!: Table<Imagen, string>
   config!: Table<Config, string>
 
   constructor() {
@@ -179,6 +253,16 @@ export class TiendaDB extends Dexie {
           await boletas.put({ ...b, tienePdf: 1 })
         }
       })
+
+    // Stock con historial y caja con arqueo. Son tablas nuevas y un índice más
+    // en ventas: no hay que convertir nada de lo que ya está cargado.
+    this.version(4).stores({
+      movStock: '++id, productoId, fecha, tipo',
+      caja: '++id, estado, abierta',
+      movCaja: '++id, cajaId, fecha',
+      imagenes: 'clave',
+      ventas: '++id, fecha, estado, usuarioId, cajaId',
+    })
   }
 }
 
@@ -202,6 +286,18 @@ export async function guardarPdf(boletaId: number, blob: Blob): Promise<void> {
 
 export async function leerPdf(boletaId: number): Promise<Blob | undefined> {
   return (await db.pdfs.get(boletaId))?.blob
+}
+
+export async function guardarImagen(clave: string, blob: Blob): Promise<void> {
+  await db.imagenes.put({ clave, blob })
+}
+
+export async function leerImagen(clave: string): Promise<Blob | undefined> {
+  return (await db.imagenes.get(clave))?.blob
+}
+
+export async function borrarImagen(clave: string): Promise<void> {
+  await db.imagenes.delete(clave)
 }
 
 export const db = new TiendaDB()

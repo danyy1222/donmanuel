@@ -1,7 +1,15 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Boton, Campo } from '../componentes/UI'
-import { db, guardarConfig, leerConfig } from '../db/db'
+import {
+  borrarImagen,
+  db,
+  guardarConfig,
+  guardarImagen,
+  leerConfig,
+  leerImagen,
+} from '../db/db'
+import { achicarQr } from '../lib/imagen'
 import {
   buscarActualizacion,
   VERSION_APP,
@@ -30,23 +38,7 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
     })()
   }, [])
 
-  const boletas = useLiveQuery(() => db.boletas.count(), [], 0)
   const productos = useLiveQuery(() => db.productos.where('activo').equals(1).count(), [], 0)
-
-  // Se consulta por el índice de fecha en vez de traer el historial entero:
-  // con miles de ventas acumuladas, cargarlas todas para sumar las de hoy
-  // trababa la pantalla cada vez que se abría.
-  const hoy = useLiveQuery(
-    async () => {
-      const desde = new Date()
-      desde.setHours(0, 0, 0, 0)
-      const delDia = await db.ventas.where('fecha').aboveOrEqual(desde).toArray()
-      const cerradas = delDia.filter((v) => v.estado === 'completada')
-      return { cantidad: cerradas.length, total: cerradas.reduce((s, v) => s + v.total, 0) }
-    },
-    [],
-    { cantidad: 0, total: 0 },
-  )
 
   const ultimas = useLiveQuery(
     () => db.ventas.orderBy('fecha').reverse().limit(10).toArray(),
@@ -63,12 +55,6 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
 
   return (
     <div className="space-y-5 p-4">
-      <section className="grid grid-cols-3 gap-2">
-        <Tarjeta titulo="Vendido hoy" valor={plata(hoy.total)} />
-        <Tarjeta titulo="Ventas hoy" valor={String(hoy.cantidad)} />
-        <Tarjeta titulo="Boletas" valor={String(boletas)} />
-      </section>
-
       <section className="rounded-xl border border-slate-200 bg-white p-4">
         <h2 className="mb-1 font-bold">Datos de la tienda</h2>
         <p className="mb-4 text-sm text-slate-500">
@@ -90,6 +76,8 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
           </Boton>
         </div>
       </section>
+
+      <CobrosDigitales onAviso={onAviso} />
 
       <section className="rounded-xl border border-slate-200 bg-white p-4">
         <h2 className="mb-1 font-bold">Respaldo</h2>
@@ -149,6 +137,127 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
       <p className="pb-4 text-center text-xs text-slate-400">
         {productos} productos activos · Tienda Don Manuel v{VERSION_APP}
       </p>
+    </div>
+  )
+}
+
+/**
+ * Los datos para cobrar por Yape y Plin.
+ *
+ * Se guarda el QR personal, que es la forma que no cobra comisión. Como es fijo
+ * y no lleva el importe adentro, en el cobro se muestra el monto al lado para
+ * que el cliente lo escriba.
+ */
+function CobrosDigitales({ onAviso }: { onAviso: (t: string) => void }) {
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <h2 className="mb-1 font-bold">Cobros por Yape y Plin</h2>
+      <p className="mb-4 text-sm text-slate-500">
+        Cargá tu QR de cada uno y aparece en la pantalla de cobro para que el cliente lo escanee.
+        Sacalo de la app: Menú → Mi QR → Descargar.
+      </p>
+      <div className="space-y-4">
+        <QrCobro metodo="yape" etiqueta="Yape" onAviso={onAviso} />
+        <QrCobro metodo="plin" etiqueta="Plin" onAviso={onAviso} />
+      </div>
+    </section>
+  )
+}
+
+function QrCobro({
+  metodo,
+  etiqueta,
+  onAviso,
+}: {
+  metodo: 'yape' | 'plin'
+  etiqueta: string
+  onAviso: (t: string) => void
+}) {
+  const [numero, setNumero] = useState('')
+  const [qr, setQr] = useState<string | null>(null)
+  /** La URL viva del blob. Va en un ref para poder soltarla al desmontar. */
+  const url = useRef<string | null>(null)
+
+  const clave = `qr-${metodo}`
+  const claveNumero = `${metodo}Numero`
+
+  const mostrar = (blob: Blob | undefined) => {
+    if (url.current) URL.revokeObjectURL(url.current)
+    url.current = blob ? URL.createObjectURL(blob) : null
+    setQr(url.current)
+  }
+
+  useEffect(() => {
+    void (async () => {
+      setNumero(await leerConfig(claveNumero))
+      mostrar(await leerImagen(clave))
+    })()
+    return () => {
+      if (url.current) URL.revokeObjectURL(url.current)
+      url.current = null
+    }
+  }, [clave, claveNumero])
+
+  const cargar = async (archivo: File) => {
+    const blob = await achicarQr(archivo)
+    await guardarImagen(clave, blob)
+    mostrar(blob)
+    onAviso(`QR de ${etiqueta} guardado`)
+  }
+
+  const quitar = async () => {
+    await borrarImagen(clave)
+    mostrar(undefined)
+    onAviso(`QR de ${etiqueta} borrado`)
+  }
+
+  return (
+    <div className="rounded-xl border border-slate-200 p-3">
+      <div className="flex items-start gap-3">
+        {qr ? (
+          <img src={qr} alt={`QR de ${etiqueta}`} className="h-20 w-20 shrink-0 rounded-lg object-cover" />
+        ) : (
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-3xl">
+            {metodo === 'yape' ? '🟣' : '🔵'}
+          </div>
+        )}
+        <div className="min-w-0 flex-1 space-y-2">
+          <Campo
+            etiqueta={`Número de ${etiqueta}`}
+            valor={numero}
+            onCambio={(v) => {
+              setNumero(v)
+              void guardarConfig(claveNumero, v.trim())
+            }}
+            tipo="tel"
+            inputMode="tel"
+            placeholder="987 654 321"
+          />
+        </div>
+      </div>
+
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <label className="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 active:bg-slate-100">
+          {qr ? 'Cambiar QR' : 'Cargar QR'}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const archivo = e.target.files?.[0]
+              if (archivo) void cargar(archivo)
+              e.target.value = ''
+            }}
+          />
+        </label>
+        <button
+          onClick={quitar}
+          disabled={!qr}
+          className="h-11 rounded-xl text-sm font-semibold text-red-600 active:bg-red-50 disabled:text-slate-300"
+        >
+          Quitar QR
+        </button>
+      </div>
     </div>
   )
 }
@@ -254,15 +363,6 @@ function RevisarActualizacion({ onAviso }: { onAviso: (t: string) => void }) {
   )
 }
 
-function Tarjeta({ titulo, valor }: { titulo: string; valor: string }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white px-2 py-3 text-center">
-      <div className="truncate text-lg font-bold tabular-nums">{valor}</div>
-      <div className="text-[11px] text-slate-500">{titulo}</div>
-    </div>
-  )
-}
-
 /**
  * Exporta todo a un JSON. Las fotos y los PDF quedan afuera a propósito: son
  * lo único pesado y ambos se pueden reconstruir —los PDF desde los datos de la
@@ -270,13 +370,16 @@ function Tarjeta({ titulo, valor }: { titulo: string; valor: string }) {
  */
 async function exportar(onAviso: (t: string) => void): Promise<void> {
   const datos = {
-    version: 2,
+    version: 3,
     fecha: new Date().toISOString(),
     categorias: await db.categorias.toArray(),
     productos: await db.productos.toArray(),
     ventas: await db.ventas.toArray(),
     boletas: await db.boletas.toArray(),
     usuarios: await db.usuarios.toArray(),
+    movStock: await db.movStock.toArray(),
+    caja: await db.caja.toArray(),
+    movCaja: await db.movCaja.toArray(),
     config: await db.config.toArray(),
   }
 
@@ -297,7 +400,19 @@ async function importar(archivo: File, onAviso: (t: string) => void): Promise<vo
     const datos = JSON.parse(await archivo.text())
     await db.transaction(
       'rw',
-      [db.categorias, db.productos, db.ventas, db.boletas, db.usuarios, db.fotos, db.pdfs, db.config],
+      [
+        db.categorias,
+        db.productos,
+        db.ventas,
+        db.boletas,
+        db.usuarios,
+        db.fotos,
+        db.pdfs,
+        db.movStock,
+        db.caja,
+        db.movCaja,
+        db.config,
+      ],
       async () => {
         await Promise.all([
           db.categorias.clear(),
@@ -309,6 +424,9 @@ async function importar(archivo: File, onAviso: (t: string) => void): Promise<vo
           // apuntarían a productos y boletas que ya no son los mismos.
           db.fotos.clear(),
           db.pdfs.clear(),
+          db.movStock.clear(),
+          db.caja.clear(),
+          db.movCaja.clear(),
           db.config.clear(),
         ])
         await db.categorias.bulkAdd(datos.categorias ?? [])
@@ -333,6 +451,21 @@ async function importar(archivo: File, onAviso: (t: string) => void): Promise<vo
             ...u,
             creado: new Date(u.creado),
           })),
+        )
+        // Respaldos de la versión 2 no traen stock ni caja: se restauran vacíos
+        // y el historial arranca de nuevo, sin romper nada de lo demás.
+        await db.movStock.bulkAdd(
+          (datos.movStock ?? []).map((m: { fecha: string }) => ({ ...m, fecha: new Date(m.fecha) })),
+        )
+        await db.caja.bulkAdd(
+          (datos.caja ?? []).map((c: { abierta: string; cerrada?: string }) => ({
+            ...c,
+            abierta: new Date(c.abierta),
+            cerrada: c.cerrada ? new Date(c.cerrada) : undefined,
+          })),
+        )
+        await db.movCaja.bulkAdd(
+          (datos.movCaja ?? []).map((m: { fecha: string }) => ({ ...m, fecha: new Date(m.fecha) })),
         )
         await db.config.bulkAdd(datos.config ?? [])
       },

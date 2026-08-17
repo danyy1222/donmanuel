@@ -221,6 +221,40 @@ function aNumeroSuelto(texto: string): number {
   return Number.isFinite(n) ? n : 0
 }
 
+/**
+ * Barra para alternar entre dos o tres vistas de una misma sección. Se usa para
+ * no llenar la barra de abajo: con más de cinco íconos el pulgar empieza a
+ * errarle.
+ */
+export function Pestañas<T extends string>({
+  valor,
+  onCambio,
+  opciones,
+}: {
+  valor: T
+  onCambio: (v: T) => void
+  opciones: { id: T; etiqueta: string }[]
+}) {
+  return (
+    <div
+      className="grid gap-1 rounded-xl bg-slate-200 p-1"
+      style={{ gridTemplateColumns: `repeat(${opciones.length}, minmax(0, 1fr))` }}
+    >
+      {opciones.map((o) => (
+        <button
+          key={o.id}
+          onClick={() => onCambio(o.id)}
+          className={`h-10 rounded-lg text-sm font-semibold transition-colors ${
+            valor === o.id ? 'bg-white text-marca-700 shadow-sm' : 'text-slate-600'
+          }`}
+        >
+          {o.etiqueta}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 /** Estado vacío con ícono y explicación, en vez de una pantalla en blanco. */
 export function Vacio({ icono, texto }: { icono: string; texto: string }) {
   return (

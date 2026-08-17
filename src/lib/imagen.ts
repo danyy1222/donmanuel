@@ -8,10 +8,30 @@ const LADO_MAXIMO = 480
  * llenaría la base y haría lenta cualquier pantalla que liste productos, para
  * dibujar una miniatura de 64 píxeles. A 480px una foto queda en unos 40 KB.
  */
-export async function achicarFoto(archivo: File): Promise<Blob> {
+export function achicarFoto(archivo: File): Promise<Blob> {
+  return achicar(archivo, LADO_MAXIMO, 'image/jpeg', 0.82)
+}
+
+/**
+ * Achica el QR de cobro.
+ *
+ * Va en PNG y más grande que una foto: el JPEG con calidad baja emborrona los
+ * cuadraditos, y este QR lo tiene que leer la cámara del cliente desde el otro
+ * lado del mostrador.
+ */
+export function achicarQr(archivo: File): Promise<Blob> {
+  return achicar(archivo, 720, 'image/png', 1)
+}
+
+async function achicar(
+  archivo: File,
+  ladoMaximo: number,
+  formato: string,
+  calidad: number,
+): Promise<Blob> {
   const bitmap = await createImageBitmap(archivo)
 
-  const escala = Math.min(1, LADO_MAXIMO / Math.max(bitmap.width, bitmap.height))
+  const escala = Math.min(1, ladoMaximo / Math.max(bitmap.width, bitmap.height))
   const ancho = Math.round(bitmap.width * escala)
   const alto = Math.round(bitmap.height * escala)
 
@@ -28,9 +48,7 @@ export async function achicarFoto(archivo: File): Promise<Blob> {
   ctx.drawImage(bitmap, 0, 0, ancho, alto)
   bitmap.close()
 
-  const reducida = await new Promise<Blob | null>((ok) =>
-    lienzo.toBlob(ok, 'image/jpeg', 0.82),
-  )
+  const reducida = await new Promise<Blob | null>((ok) => lienzo.toBlob(ok, formato, calidad))
 
   // Si por lo que sea la conversión no achicó nada, se guarda el original.
   return reducida && reducida.size < archivo.size ? reducida : archivo

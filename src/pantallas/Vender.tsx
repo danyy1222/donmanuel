@@ -6,7 +6,9 @@ import { Boton, Vacio } from '../componentes/UI'
 import { VisorCamara } from '../componentes/VisorCamara'
 import { db, type Producto, type Venta, type VentaItem } from '../db/db'
 import type { Sesion } from '../lib/usuarios'
+import { cajaAbierta } from '../lib/caja'
 import { cantidadTexto, normalizar, plata } from '../lib/formato'
+import { moverStock } from '../lib/stock'
 import { Cobrar } from './Cobrar'
 
 interface Props {
@@ -75,6 +77,7 @@ export function Vender({ sesion, onVentaLista, onAviso }: Props) {
           tipoVenta: 'unidad',
           cantidad: 1,
           precioUnit: producto.precioVenta,
+          costoUnit: producto.precioCosto,
           subtotal: producto.precioVenta,
         })
         onAviso(`${producto.nombre} · ${plata(producto.precioVenta)}`)
@@ -92,6 +95,9 @@ export function Vender({ sesion, onVentaLista, onAviso }: Props) {
     pagoCon?: number,
   ) => {
     const subtotal = total
+    // Se pregunta por el turno acá y no al montar la pantalla: la caja se puede
+    // haber abierto después, y una venta sin turno no aparece en el arqueo.
+    const turno = await cajaAbierta()
     const venta: Venta = {
       fecha: new Date(),
       usuarioId: sesion.usuario.id,
@@ -103,15 +109,18 @@ export function Vender({ sesion, onVentaLista, onAviso }: Props) {
       metodoPago,
       pagoCon,
       vuelto: pagoCon ? pagoCon - (subtotal - descuento) : undefined,
+      cajaId: turno?.id,
       estado: 'completada',
     }
 
-    const id = await db.transaction('rw', db.ventas, db.productos, async () => {
+    const id = await db.transaction('rw', db.ventas, db.productos, db.movStock, async () => {
       const nuevoId = await db.ventas.add(venta)
       for (const item of carrito) {
         if (item.productoId === undefined) continue
-        const p = await db.productos.get(item.productoId)
-        if (p) await db.productos.update(item.productoId, { stock: p.stock - item.cantidad })
+        await moverStock(item.productoId, 'venta', -item.cantidad, {
+          usuarioNombre: sesion.usuario.nombre,
+          ventaId: nuevoId,
+        })
       }
       return nuevoId
     })

@@ -41,6 +41,7 @@ export function CargarItem({ producto, onCerrar, onAgregar }: Props) {
       tipoVenta: producto.tipoVenta,
       cantidad: Math.round(cantidad * 1000) / 1000,
       precioUnit: producto.precioVenta,
+      costoUnit: producto.precioCosto,
       subtotal: Math.round(subtotal * 100) / 100,
     })
     cerrar()

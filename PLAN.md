@@ -79,7 +79,7 @@ Esto no es una app de oficina, es para un mostrador:
   - **Por plata:** el cliente pide "$500 de papa" → tecleo `$500` y el sistema dice cuánto pesar.
 - Carrito editable: cambiar cantidad, sacar un ítem, poner descuento a un producto suelto.
 - Descuento sobre el total, en % o en pesos.
-- **Formas de cobro:** efectivo, tarjeta, transferencia/QR, **fiado (cuenta corriente)**, y pago mixto (una parte en efectivo, otra transferencia).
+- **Formas de cobro:** efectivo, **Yape**, **Plin**, tarjeta, transferencia, **fiado (cuenta corriente)**, y pago mixto (una parte en efectivo, otra por Yape).
 - Cálculo automático del vuelto.
 - **Venta en espera:** el cliente se olvidó algo y va a buscarlo → se guarda su carrito, se atiende al siguiente, después se retoma.
 - Anular venta y hacer devoluciones (devuelve el stock).
@@ -262,14 +262,19 @@ Adelantado desde la Fase 5. Login con PIN de 4 números, roles Dueño y Cajero, 
 
 El sistema no deja quedarse sin ningún dueño: ni dándolo de baja ni bajándole el rol al último.
 
-### Fase 3 — Que los números cierren
-Stock con entradas, merma y ajustes. Apertura y cierre de caja. Pantalla de cambio rápido de precios.
+### ✅ Fase 3 — Que los números cierren — HECHA (falta el cambio rápido de precios)
+Stock con entradas, merma valorizada, conteo e historial completo. Apertura de caja, ingresos y egresos, y cierre con arqueo a ciegas. Se sumaron además los reportes de la Fase 5 (ganancia real, métodos de pago, más vendidos, horarios), porque sin ellos la merma y el arqueo quedaban registrados pero sin dónde mirarse.
+
+Queda pendiente de esta fase la **pantalla de cambio rápido de precios**.
+
+### ✅ Cobros peruanos — HECHO
+Yape y Plin como métodos separados, con el QR de la tienda en pantalla al cobrar. Ver [Qué se tomó de cada sistema](#5-qué-se-tomó-de-cada-sistema-del-mercado).
 
 ### Fase 4 — Fiado y proveedores
 Clientes con cuenta corriente, pagos, deuda. Proveedores y compras.
 
 ### Fase 5 — Control
-Reportes y ganancias. Todas las formas de cobro y pago mixto. (Usuarios con PIN, roles y respaldo ya están hechos.)
+Pago mixto (una parte en efectivo, otra por Yape). (Usuarios con PIN, roles, respaldo y reportes ya están hechos.)
 
 ### Fase 6 — Terminaciones
 Impresión bluetooth en térmica. Devoluciones y anulaciones. Ventas en espera. Ajustes finos de la interfaz con el uso real.
@@ -288,7 +293,40 @@ La app sigue siendo también una PWA: el mismo código genera las dos cosas.
 
 ---
 
-## 5. Cosas a tener en cuenta
+## 5. Qué se tomó de cada sistema del mercado
+
+Se miraron los sistemas que hoy usan las tiendas chicas, dos globales y tres
+peruanos, para no inventar de cero lo que ya está resuelto.
+
+| Sistema | Qué hace bien | Qué se tomó |
+|---|---|---|
+| **Loyverse** (gratis, global) | Es la referencia del rubro en su versión gratuita | Aviso de stock bajo, ajustes por *damages and loss* (nuestra merma) y conteo de inventario |
+| **Square** (global) | Reportes que se entienden de un vistazo | Panel con vendido, ganancia, ticket promedio y horarios de más venta |
+| **Kyte** (62 mil comercios chicos) | Offline de verdad, cobro por QR sin terminal | Confirmación de que el camino offline + QR es el correcto para este tamaño de tienda |
+| **PANCA, digabloPos, INVY** (Perú) | Están hechos para la bodega peruana | **Yape y Plin como métodos separados** y arqueo que no mezcla lo digital con el cajón |
+| **Bsale** (Perú, pago) | Facturación electrónica SUNAT integrada | Nada por ahora: el Nuevo RUS no está obligado. Ver [FACTURACION-PERU.md](FACTURACION-PERU.md) |
+
+### Lo más importante que salió de mirarlos
+
+**Yape y Plin no son "transferencia".** Alrededor del 70% de las ventas de una
+bodega peruana no son con tarjeta, y son interoperables desde 2023: el cliente
+paga con QR o al número, sin importar su banco. El error de contabilidad más
+común que describen los tres sistemas peruanos es registrar un pago por Yape
+como efectivo. Por eso acá son métodos propios y el arqueo los deja afuera del
+cajón.
+
+**El QR estático no cobra comisión.** Yape Empresa y Plin Empresa cobran un
+porcentaje por transacción; el QR personal no. Como es fijo y no lleva el monto
+adentro, la app lo muestra con el importe grande al lado para que el cliente lo
+escriba, y el cobro se confirma a mano cuando llega el aviso.
+
+**Lo que se dejó afuera a propósito:** los módulos de fidelización y de venta
+por redes sociales que traen Loyverse y Kyte. Son para otro tipo de comercio;
+acá agregarían pantallas que nadie va a tocar en el mostrador.
+
+---
+
+## 6. Cosas a tener en cuenta
 
 - **El respaldo va desde la Fase 1.** Los datos viven en el celular; si se pierde o se formatea, sin respaldo se pierde todo. Es el riesgo más serio de esta arquitectura y se resuelve con exportación periódica.
 - **La cámara necesita HTTPS.** Para desarrollo alcanza con `localhost`; para usarlo en la tienda hay que servir la app por HTTPS (hay opciones gratuitas) o pasar a APK.

@@ -2,12 +2,14 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import { CapturarCodigo } from '../componentes/CapturarCodigo'
 import { FotoProducto } from '../componentes/FotoProducto'
-import { Boton, Campo, CampoNumero, Hoja, Vacio } from '../componentes/UI'
+import { Boton, Campo, CampoNumero, Hoja, Pestañas, Vacio } from '../componentes/UI'
 import { db, guardarFoto, type Producto, type TipoVenta } from '../db/db'
 import { normalizar, plata, SIMBOLO } from '../lib/formato'
 import { achicarFoto } from '../lib/imagen'
+import { estaBajo } from '../lib/stock'
 import { puede, type Sesion } from '../lib/usuarios'
 import { Categorias } from './Categorias'
+import { Stock } from './Stock'
 
 const VACIO: Omit<Producto, 'id'> = {
   nombre: '',
@@ -20,7 +22,43 @@ const VACIO: Omit<Producto, 'id'> = {
   activo: 1,
 }
 
-export function Productos({ sesion, onAviso }: { sesion: Sesion; onAviso: (t: string) => void }) {
+interface PantallaProps {
+  sesion: Sesion
+  onAviso: (t: string) => void
+}
+
+/**
+ * El catálogo y el stock son la misma sección con dos vistas: en el catálogo se
+ * define qué es cada producto y cuánto sale, y en el stock se mueve cuánto hay.
+ * Separarlas en dos pestañas de abajo dejaría seis íconos en la barra.
+ */
+export function Productos({ sesion, onAviso }: PantallaProps) {
+  const [vista, setVista] = useState<'catalogo' | 'stock'>('catalogo')
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="shrink-0 border-b border-slate-200 bg-white px-3 pt-3">
+        <Pestañas
+          valor={vista}
+          onCambio={setVista}
+          opciones={[
+            { id: 'catalogo', etiqueta: '📋 Catálogo' },
+            { id: 'stock', etiqueta: '📦 Stock' },
+          ]}
+        />
+      </div>
+      <div className="min-h-0 flex-1">
+        {vista === 'catalogo' ? (
+          <Catalogo sesion={sesion} onAviso={onAviso} />
+        ) : (
+          <Stock sesion={sesion} onAviso={onAviso} />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Catalogo({ sesion, onAviso }: PantallaProps) {
   const [busqueda, setBusqueda] = useState('')
   const [editando, setEditando] = useState<Producto | null>(null)
   const [verCategorias, setVerCategorias] = useState(false)
@@ -82,7 +120,7 @@ export function Productos({ sesion, onAviso }: { sesion: Sesion; onAviso: (t: st
                   <div className="text-xs text-slate-500">
                     Stock: {p.stock.toFixed(p.tipoVenta === 'peso' ? 1 : 0)}
                     {p.tipoVenta === 'peso' ? ' kg' : ' u.'}
-                    {p.stock <= p.stockMinimo && (
+                    {estaBajo(p) && (
                       <span className="ml-2 font-semibold text-amber-600">¡Poco stock!</span>
                     )}
                   </div>

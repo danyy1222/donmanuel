@@ -7,14 +7,16 @@ import { plata } from './lib/formato'
 import { olvidarSesion, puede, sesionGuardada, type Sesion } from './lib/usuarios'
 import { Ajustes } from './pantallas/Ajustes'
 import { Boletas } from './pantallas/Boletas'
+import { Caja } from './pantallas/Caja'
 import { Entrar } from './pantallas/Entrar'
 import { Productos } from './pantallas/Productos'
 import { Vender } from './pantallas/Vender'
 
-type Seccion = 'vender' | 'productos' | 'boletas' | 'ajustes'
+type Seccion = 'vender' | 'caja' | 'productos' | 'boletas' | 'ajustes'
 
 const SECCIONES: { id: Seccion; etiqueta: string; icono: string; soloDueño?: boolean }[] = [
   { id: 'vender', etiqueta: 'Vender', icono: '🛒' },
+  { id: 'caja', etiqueta: 'Caja', icono: '💰' },
   { id: 'productos', etiqueta: 'Productos', icono: '📦', soloDueño: true },
   { id: 'boletas', etiqueta: 'Boletas', icono: '🧾' },
   { id: 'ajustes', etiqueta: 'Ajustes', icono: '⚙️', soloDueño: true },
@@ -58,6 +60,7 @@ export default function App() {
         {seccion === 'vender' && (
           <Vender sesion={sesion} onVentaLista={setReciente} onAviso={mostrarAviso} />
         )}
+        {seccion === 'caja' && <Caja sesion={sesion} onAviso={mostrarAviso} />}
         {seccion === 'productos' && <Productos sesion={sesion} onAviso={mostrarAviso} />}
         {seccion === 'boletas' && <Boletas onAviso={mostrarAviso} />}
         {seccion === 'ajustes' && (
