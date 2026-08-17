@@ -12,7 +12,12 @@ import { fileURLToPath } from 'node:url'
 const REPO = 'danyy1222/donmanuel'
 const raiz = (p) => fileURLToPath(new URL(`../${p}`, import.meta.url))
 
-const [version, notas] = process.argv.slice(2)
+// Las novedades se juntan de todo lo que venga después de la versión: al pasar
+// por `npm run publicar`, Windows se come las comillas y el texto llega partido
+// en una palabra por argumento. Tomando solo argv[3] se publicaría la primera.
+const [version, ...resto] = process.argv.slice(2)
+const notas = resto.join(' ').trim()
+
 if (!version || !notas) {
   console.error('Uso: node scripts/publicar.mjs 1.2.2 "qué cambió"')
   process.exit(1)
