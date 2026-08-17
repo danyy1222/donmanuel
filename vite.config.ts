@@ -2,8 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import paquete from './package.json' with { type: 'json' }
 
 export default defineConfig({
+  // La app necesita saber su propia versión para compararla con la publicada.
+  // Se toma de package.json para no tener el número escrito en dos lados.
+  define: {
+    __VERSION_APP__: JSON.stringify(paquete.version),
+  },
   plugins: [
     react(),
     tailwindcss(),

@@ -2,6 +2,11 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { Boton, Campo } from '../componentes/UI'
 import { db, guardarConfig, leerConfig } from '../db/db'
+import {
+  buscarActualizacion,
+  VERSION_APP,
+  type Actualizacion,
+} from '../lib/actualizaciones'
 import { fechaCorta, plata } from '../lib/formato'
 import type { Sesion } from '../lib/usuarios'
 import { Usuarios } from './Usuarios'
@@ -133,14 +138,58 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
         )}
       </section>
 
+      <RevisarActualizacion onAviso={onAviso} />
+
       <Boton tipo="secundario" onClick={onSalir} className="w-full">
         🚪 Salir ({sesion.usuario.nombre})
       </Boton>
 
       <p className="pb-4 text-center text-xs text-slate-400">
-        {productos} productos activos · Tienda Don Manuel
+        {productos} productos activos · Tienda Don Manuel v{VERSION_APP}
       </p>
     </div>
+  )
+}
+
+/**
+ * Revisión manual, además de la automática al abrir la app. Sirve cuando se
+ * sabe que salió algo nuevo y no se quiere esperar a la próxima revisión.
+ */
+function RevisarActualizacion({ onAviso }: { onAviso: (t: string) => void }) {
+  const [buscando, setBuscando] = useState(false)
+  const [encontrada, setEncontrada] = useState<Actualizacion | null>(null)
+
+  const revisar = async () => {
+    setBuscando(true)
+    // Se fuerza para saltear el límite de una vez por hora y el "Después".
+    const r = await buscarActualizacion(true)
+    setBuscando(false)
+    if (r) setEncontrada(r)
+    else onAviso('Ya tenés la última versión')
+  }
+
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <h2 className="mb-1 font-bold">Actualizaciones</h2>
+      <p className="mb-4 text-sm text-slate-500">
+        La app revisa sola al abrirse. Acá podés revisar cuando quieras.
+      </p>
+
+      {encontrada ? (
+        <div className="space-y-3">
+          <p className="rounded-xl bg-marca-50 px-4 py-3 text-center text-sm text-marca-800">
+            Sale la <strong>{encontrada.version}</strong>. {encontrada.novedades}
+          </p>
+          <Boton onClick={() => window.open(encontrada.descarga, '_blank')} className="w-full">
+            ⬇ Descargar
+          </Boton>
+        </div>
+      ) : (
+        <Boton tipo="secundario" onClick={revisar} disabled={buscando} className="w-full">
+          {buscando ? 'Revisando...' : '🔄 Buscar actualización'}
+        </Boton>
+      )}
+    </section>
   )
 }
 

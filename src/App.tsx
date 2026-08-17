@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { AvisoActualizacion } from './componentes/AvisoActualizacion'
 import { CrearBoleta } from './componentes/CrearBoleta'
 import { Aviso, Boton, Hoja } from './componentes/UI'
 import type { Venta } from './db/db'
@@ -99,6 +100,9 @@ export default function App() {
       />
 
       <CrearBoleta venta={paraBoleta} onCerrar={() => setParaBoleta(null)} onAviso={mostrarAviso} />
+
+      {/* Solo se busca actualización con la caja libre: nunca sobre una venta. */}
+      <AvisoActualizacion activo={reciente === null && paraBoleta === null} />
 
       <Aviso texto={aviso} onIr={limpiarAviso} />
     </div>
