@@ -209,7 +209,8 @@ function enA4(doc: jsPDF, autoTable: AutoTable, boleta: Boleta, tienda: DatosTie
       plata(i.subtotal),
     ]),
     styles: { fontSize: 9, cellPadding: 2.5 },
-    headStyles: { fillColor: [21, 128, 61], halign: 'left' },
+    // Morado de marca (#7e22ce). Ver marca.json.
+    headStyles: { fillColor: [126, 34, 206], halign: 'left' },
     columnStyles: {
       1: { halign: 'right' },
       2: { halign: 'right' },

@@ -1,13 +1,19 @@
 @import 'tailwindcss';
 
+/*
+ * Color de la app. El tono principal es marca-700 y está repetido en
+ * marca.json, index.html, vite.config.ts, src/lib/nativo.ts y
+ * src/lib/boletaPdf.ts: son mundos distintos (CSS, manifiesto, Android, PDF)
+ * y ninguno puede leer al otro.
+ */
 @theme {
-  --color-marca-50: #f0fdf4;
-  --color-marca-100: #dcfce7;
-  --color-marca-200: #bbf7d0;
-  --color-marca-500: #22c55e;
-  --color-marca-600: #16a34a;
-  --color-marca-700: #15803d;
-  --color-marca-800: #166534;
+  --color-marca-50: #faf5ff;
+  --color-marca-100: #f3e8ff;
+  --color-marca-200: #e9d5ff;
+  --color-marca-500: #a855f7;
+  --color-marca-600: #9333ea;
+  --color-marca-700: #7e22ce;
+  --color-marca-800: #6b21a8;
 }
 
 html {

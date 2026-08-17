@@ -1,0 +1,5 @@
+{
+  "nombre": "Tienda Don Manuel",
+  "color": "#7e22ce",
+  "_nota": "Color principal de la app. Los scripts de íconos lo leen de acá. Si lo cambiás, actualizá también: src/index.css (escala marca-*), index.html (theme-color), vite.config.ts (theme_color), src/lib/nativo.ts (barra de estado) y src/lib/boletaPdf.ts (encabezado del PDF A4)."
+}

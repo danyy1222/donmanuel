@@ -14,7 +14,7 @@ export default defineConfig({
         name: 'Tienda Don Manuel',
         short_name: 'Don Manuel',
         description: 'Punto de venta para verdulería y abarrotes',
-        theme_color: '#15803d',
+        theme_color: '#7e22ce',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
