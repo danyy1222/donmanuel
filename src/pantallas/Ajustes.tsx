@@ -12,6 +12,7 @@ import {
 import { achicarQr } from '../lib/imagen'
 import {
   buscarActualizacion,
+  ES_PRUEBAS,
   VERSION_APP,
   type Actualizacion,
 } from '../lib/actualizaciones'
@@ -135,7 +136,8 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
       </Boton>
 
       <p className="pb-4 text-center text-xs text-slate-400">
-        {productos} productos activos · Tienda Don Manuel v{VERSION_APP}
+        {productos} productos activos · {ES_PRUEBAS ? 'Don Manuel PRUEBAS' : 'Tienda Don Manuel'} v
+        {VERSION_APP}
       </p>
     </div>
   )
@@ -328,6 +330,23 @@ function VaciarCatalogo({ onAviso }: { onAviso: (t: string) => void }) {
 function RevisarActualizacion({ onAviso }: { onAviso: (t: string) => void }) {
   const [buscando, setBuscando] = useState(false)
   const [encontrada, setEncontrada] = useState<Actualizacion | null>(null)
+
+  if (ES_PRUEBAS) {
+    return (
+      <section className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <h2 className="mb-1 font-bold text-amber-900">App de pruebas</h2>
+        <p className="text-sm text-amber-900">
+          Esta app no se actualiza sola a propósito: se instala a mano en el celular de prueba. Así
+          nunca puede llegarle a los celulares de la tienda, que siguen con la app de siempre.
+        </p>
+        <p className="mt-2 text-sm text-amber-900">
+          Sus datos también están aparte: lo que cargues acá no toca los productos ni las ventas de
+          la tienda. Si querés probar con tus productos de verdad, exportá el respaldo desde la app
+          de la tienda e importalo acá.
+        </p>
+      </section>
+    )
+  }
 
   const revisar = async () => {
     setBuscando(true)

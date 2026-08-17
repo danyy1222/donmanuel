@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { ES_PRUEBAS } from '../lib/actualizaciones'
 import { SEPARADOR_DECIMAL } from '../lib/formato'
 
 interface BotonProps {
@@ -251,6 +252,22 @@ export function Pestañas<T extends string>({
           {o.etiqueta}
         </button>
       ))}
+    </div>
+  )
+}
+
+/**
+ * Cinta que marca la app de pruebas.
+ *
+ * Las dos apps quedan instaladas en el mismo celular y se parecen. Vender de
+ * verdad dentro de la de pruebas —o probar dentro de la de la tienda— sería un
+ * lío para desarmar, así que conviene que se note de una sola mirada.
+ */
+export function CintaPruebas() {
+  if (!ES_PRUEBAS) return null
+  return (
+    <div className="shrink-0 bg-amber-400 px-3 py-1 text-center text-[11px] font-bold tracking-wide text-amber-950">
+      PRUEBAS · esta no es la app de la tienda
     </div>
   )
 }

@@ -37,6 +37,38 @@ Play Store; pasa porque el APK está firmado con la clave de desarrollo.
 
 Instalada así funciona **todo sin internet**, incluido el escáner de la cámara.
 
+### App de pruebas, separada de la de la tienda
+
+```bash
+npm run apk:pruebas
+```
+
+Deja **`don-manuel-pruebas.apk`**, que es **otra app para Android**, no una versión
+distinta de la misma:
+
+| | App de la tienda | App de pruebas |
+|---|---|---|
+| Identificador | `com.tienda.sistema` | `com.tienda.sistema.pruebas` |
+| Nombre en el celular | Tienda Don Manuel | **Don Manuel PRUEBAS** |
+| Base de datos | La de la tienda | Propia y vacía |
+| Busca actualizaciones | Sí | **No** |
+
+Las dos conviven en el mismo celular. Android separa el almacenamiento por
+identificador, así que la de pruebas arranca vacía y **no puede tocar los
+productos ni las ventas de la tienda**, ni instalándose ni desinstalándose.
+
+La de pruebas lleva una cinta amarilla arriba que dice *PRUEBAS*, porque las dos
+apps se parecen y vender de verdad dentro de la equivocada sería un lío para
+desarmar.
+
+**No busca actualizaciones a propósito.** No es que esté configurada para no
+hacerlo: el compilador elimina ese código del paquete, así que el canal de
+pruebas no tiene forma de llegar a los celulares de la tienda. Se instala a
+mano, en el celular de prueba, y ahí se queda.
+
+Para probar con tus productos de verdad: exportá el respaldo desde la app de la
+tienda e importalo en la de pruebas.
+
 ### Requisitos para generar el APK
 
 Las herramientas de Android viven fuera del proyecto, en

@@ -1,10 +1,26 @@
 apply plugin: 'com.android.application'
 
+// Canal de compilacion. Con `-Pcanal=pruebas` sale una app distinta para
+// Android: otro applicationId y otro nombre.
+//
+// Eso es lo que hace que convivan las dos en el mismo celular. Android separa
+// el almacenamiento por applicationId, asi que la app de pruebas arranca con su
+// propia base de datos y no puede tocar los productos ni las ventas de la
+// tienda, ni al instalarse ni al desinstalarse.
+//
+// El `namespace` no cambia: ese es el paquete del codigo Java, no la identidad
+// de la app instalada.
+def canal = project.hasProperty('canal') ? project.canal : 'produccion'
+def esPruebas = canal == 'pruebas'
+
 android {
     namespace = "com.tienda.sistema"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.tienda.sistema"
+        applicationId esPruebas ? "com.tienda.sistema.pruebas" : "com.tienda.sistema"
+        // El nombre bajo el icono. Se define aca y no en strings.xml porque
+        // depende del canal; ponerlo en los dos lados es recurso duplicado.
+        resValue "string", "app_name", esPruebas ? "Don Manuel PRUEBAS" : "Tienda Don Manuel"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,7 +1,17 @@
 /** Lo inyecta Vite desde package.json al compilar. */
 declare const __VERSION_APP__: string
+/** Lo inyecta Vite según se compile con `npm run apk` o `npm run apk:pruebas`. */
+declare const __CANAL__: string
 
 export const VERSION_APP = __VERSION_APP__
+
+/**
+ * Si esta es la compilación de pruebas.
+ *
+ * La app de pruebas es otra app para Android: tiene su propio identificador, se
+ * instala al lado de la de la tienda y no comparte la base de datos.
+ */
+export const ES_PRUEBAS = __CANAL__ === 'pruebas'
 
 /**
  * De dónde se lee el archivo de versiones, en orden de preferencia.
@@ -72,6 +82,12 @@ export async function buscarActualizacion(
   forzar = false,
 ): Promise<Actualizacion | null> {
   try {
+    // La app de pruebas no busca actualizaciones nunca. Se instala a mano en el
+    // celular de prueba y ahí se queda. Así el canal de pruebas no puede
+    // llegarle por error a los celulares de la tienda: no hay disciplina que
+    // mantener, sencillamente no existe el camino.
+    if (ES_PRUEBAS) return null
+
     if (!forzar) {
       const ultima = Number(localStorage.getItem(CLAVE_ULTIMA_REVISION) ?? 0)
       if (Date.now() - ultima < CADA) return null

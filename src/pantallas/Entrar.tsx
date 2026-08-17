@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Boton, Campo } from '../componentes/UI'
+import { Boton, Campo, CintaPruebas } from '../componentes/UI'
 import { Teclado } from '../componentes/Teclado'
 import type { Usuario } from '../db/db'
 import {
@@ -202,8 +202,9 @@ function Marco({
   children: React.ReactNode
 }) {
   return (
-    <div className="area-segura-arriba area-segura-abajo area-segura-lados flex h-dvh flex-col justify-center overflow-y-auto bg-marca-700 px-6 py-8">
-      <div className="mx-auto w-full max-w-sm">
+    <div className="area-segura-arriba area-segura-abajo area-segura-lados flex h-dvh flex-col overflow-y-auto bg-marca-700">
+      <CintaPruebas />
+      <div className="mx-auto my-auto w-full max-w-sm px-6 py-8">
         <h1 className="mb-1 text-center text-2xl font-bold text-white">{titulo}</h1>
         {subtitulo && <p className="mb-6 text-center text-white/80">{subtitulo}</p>}
         {!subtitulo && <div className="mb-6" />}

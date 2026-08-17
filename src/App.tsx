@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AvisoActualizacion } from './componentes/AvisoActualizacion'
 import { CrearBoleta } from './componentes/CrearBoleta'
-import { Aviso, Boton, Hoja } from './componentes/UI'
+import { Aviso, Boton, CintaPruebas, Hoja } from './componentes/UI'
 import type { Venta } from './db/db'
 import { plata } from './lib/formato'
 import { olvidarSesion, puede, sesionGuardada, type Sesion } from './lib/usuarios'
@@ -56,6 +56,8 @@ export default function App() {
 
   return (
     <div className="area-segura-arriba area-segura-lados flex h-dvh flex-col overflow-hidden bg-marca-700">
+      <CintaPruebas />
+
       <main className="min-h-0 flex-1 overflow-y-auto bg-slate-100">
         {seccion === 'vender' && (
           <Vender sesion={sesion} onVentaLista={setReciente} onAviso={mostrarAviso} />

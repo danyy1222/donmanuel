@@ -5,8 +5,10 @@
       vuelve a tocar en cada `cap sync`. Si cambia el nombre de la app en
       capacitor.config.ts, hay que actualizarlo también acá o el ícono del
       celular sigue mostrando el nombre viejo.
+
+      `app_name` no está acá: lo define build.gradle, porque cambia según se
+      compile la app de la tienda o la de pruebas.
     -->
-    <string name="app_name">Tienda Don Manuel</string>
     <string name="title_activity_main">Tienda Don Manuel</string>
     <string name="package_name">com.tienda.sistema</string>
     <string name="custom_url_scheme">com.tienda.sistema</string>
