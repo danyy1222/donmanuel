@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "novedades": "Ahora se pueden crear, renombrar y borrar categorías desde Productos. La app cambió a color morado.",
+  "version": "1.2.0",
+  "novedades": "Ahora se pueden borrar todos los productos de una vez, desde Ajustes, para empezar a cargar el catálogo de la tienda sin dar de baja uno por uno.",
   "descarga": "https://github.com/danyy1222/donmanuel/releases/latest",
-  "_nota": "La app lee este archivo desde raw.githubusercontent.com para saber si hay una versión más nueva que la instalada. Para publicar una actualización: subir el APK a un Release de GitHub, y acá subir el número de version y describir las novedades en una línea."
+  "_nota": "La app lee este archivo desde raw.githubusercontent.com para saber si hay una versión más nueva que la instalada. Para publicar una actualización: subir el APK a un Release de GitHub, y recién después subir acá el número de version. Al revés, el aviso saldría con un enlace de descarga que todavía no existe."
 }

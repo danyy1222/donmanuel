@@ -138,6 +138,8 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
         )}
       </section>
 
+      <VaciarCatalogo onAviso={onAviso} />
+
       <RevisarActualizacion onAviso={onAviso} />
 
       <Boton tipo="secundario" onClick={onSalir} className="w-full">
@@ -148,6 +150,65 @@ export function Ajustes({ sesion, onAviso, onSalir }: Props) {
         {productos} productos activos · Tienda Don Manuel v{VERSION_APP}
       </p>
     </div>
+  )
+}
+
+/**
+ * Borra todos los productos de una vez.
+ *
+ * La app viene con decenas de productos de ejemplo, y al empezar a cargar los
+ * de la tienda darlos de baja uno por uno es media hora de trabajo.
+ *
+ * Las ventas ya hechas no se tocan: cada línea de venta guarda copiado el
+ * nombre y el precio del producto, así que el historial y las boletas siguen
+ * mostrando lo que se cobró.
+ */
+function VaciarCatalogo({ onAviso }: { onAviso: (t: string) => void }) {
+  const [confirmando, setConfirmando] = useState(false)
+  const cuantos = useLiveQuery(() => db.productos.count(), [], 0)
+
+  const vaciar = async () => {
+    await db.transaction('rw', db.productos, db.fotos, async () => {
+      await db.fotos.clear()
+      await db.productos.clear()
+    })
+    onAviso(`${cuantos} productos borrados`)
+    setConfirmando(false)
+  }
+
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <h2 className="mb-1 font-bold">Vaciar el catálogo</h2>
+      <p className="mb-4 text-sm text-slate-500">
+        Borra los {cuantos} productos cargados, para empezar con los tuyos. Las categorías, las
+        ventas y las boletas no se tocan.
+      </p>
+
+      {confirmando ? (
+        <div className="space-y-3 rounded-xl border border-red-200 bg-red-50 p-3">
+          <p className="text-sm font-medium text-red-800">
+            Se borran los {cuantos} productos y sus fotos. Esto no se puede deshacer.
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <Boton tipo="secundario" onClick={() => setConfirmando(false)}>
+              Cancelar
+            </Boton>
+            <Boton tipo="peligro" onClick={vaciar}>
+              Borrar todo
+            </Boton>
+          </div>
+        </div>
+      ) : (
+        <Boton
+          tipo="secundario"
+          onClick={() => setConfirmando(true)}
+          disabled={cuantos === 0}
+          className="w-full"
+        >
+          🗑 Borrar todos los productos
+        </Boton>
+      )}
+    </section>
   )
 }
 
