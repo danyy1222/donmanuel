@@ -7,6 +7,7 @@ import { db, guardarFoto, type Producto, type TipoVenta } from '../db/db'
 import { normalizar, plata, SIMBOLO } from '../lib/formato'
 import { achicarFoto } from '../lib/imagen'
 import { puede, type Sesion } from '../lib/usuarios'
+import { Categorias } from './Categorias'
 
 const VACIO: Omit<Producto, 'id'> = {
   nombre: '',
@@ -22,6 +23,7 @@ const VACIO: Omit<Producto, 'id'> = {
 export function Productos({ sesion, onAviso }: { sesion: Sesion; onAviso: (t: string) => void }) {
   const [busqueda, setBusqueda] = useState('')
   const [editando, setEditando] = useState<Producto | null>(null)
+  const [verCategorias, setVerCategorias] = useState(false)
   const verCostos = puede(sesion, 'verCostos')
 
   const categorias = useLiveQuery(() => db.categorias.orderBy('orden').toArray(), [], [])
@@ -36,19 +38,30 @@ export function Productos({ sesion, onAviso }: { sesion: Sesion; onAviso: (t: st
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 gap-2 border-b border-slate-200 bg-white p-3">
-        <input
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscar..."
-          className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-marca-500"
-        />
+      <div className="shrink-0 space-y-2 border-b border-slate-200 bg-white p-3">
+        <div className="flex gap-2">
+          <input
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar..."
+            className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-marca-500"
+          />
+          <button
+            onClick={() => setEditando({ ...VACIO, categoriaId: categorias[0]?.id ?? 0 })}
+            disabled={categorias.length === 0}
+            className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl bg-marca-600 text-2xl text-white active:bg-marca-700 disabled:bg-slate-300"
+            aria-label="Nuevo producto"
+          >
+            +
+          </button>
+        </div>
+
         <button
-          onClick={() => setEditando({ ...VACIO, categoriaId: categorias[0]?.id ?? 0 })}
-          className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl bg-marca-600 text-2xl text-white active:bg-marca-700"
-          aria-label="Nuevo producto"
+          onClick={() => setVerCategorias(true)}
+          className="flex w-full items-center justify-between rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-600 active:bg-slate-200"
         >
-          +
+          <span>🏷️ Administrar categorías</span>
+          <span className="text-slate-400">{categorias.length} →</span>
         </button>
       </div>
 
@@ -90,6 +103,12 @@ export function Productos({ sesion, onAviso }: { sesion: Sesion; onAviso: (t: st
         categorias={categorias}
         verCostos={verCostos}
         onCerrar={() => setEditando(null)}
+        onAviso={onAviso}
+      />
+
+      <Categorias
+        abierto={verCategorias}
+        onCerrar={() => setVerCategorias(false)}
         onAviso={onAviso}
       />
     </div>
