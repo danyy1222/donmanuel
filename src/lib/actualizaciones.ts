@@ -26,6 +26,16 @@ const CADA = 60 * 60 * 1000 // una hora
 
 const CLAVE_ULTIMA_REVISION = 'ultimaRevisionActualizacion'
 const CLAVE_POSPUESTA = 'versionPospuesta'
+const CLAVE_SILENCIO = 'avisoSilenciadoHasta'
+
+/**
+ * Cuánto se calla el aviso después de tocar Descargar.
+ *
+ * Es un silencio con vencimiento y no definitivo: si la descarga se cortó o la
+ * instalación quedó a medias, la app tiene que volver a insistir. Si en cambio
+ * la instalación salió bien, la versión ya coincide y no hay nada que avisar.
+ */
+const SILENCIO_TRAS_DESCARGAR = 6 * 60 * 60 * 1000 // seis horas
 
 export interface Actualizacion {
   version: string
@@ -73,7 +83,11 @@ export async function buscarActualizacion(
     localStorage.setItem(CLAVE_ULTIMA_REVISION, String(Date.now()))
 
     if (!datos.version || !esMasNueva(datos.version, VERSION_APP)) return null
-    if (!forzar && localStorage.getItem(CLAVE_POSPUESTA) === datos.version) return null
+
+    if (!forzar) {
+      if (localStorage.getItem(CLAVE_POSPUESTA) === datos.version) return null
+      if (Date.now() < Number(localStorage.getItem(CLAVE_SILENCIO) ?? 0)) return null
+    }
 
     return {
       version: datos.version,
@@ -113,4 +127,13 @@ async function leerDeLasFuentes(): Promise<Partial<Actualizacion> | null> {
 /** Deja de avisar por esta versión hasta que salga otra. */
 export function posponer(version: string): void {
   localStorage.setItem(CLAVE_POSPUESTA, version)
+}
+
+/**
+ * Calla el aviso un rato después de mandar a descargar, sin darlo por
+ * instalado. Si la descarga o la instalación no llegaron a buen puerto, la app
+ * vuelve a avisar sola en unas horas.
+ */
+export function silenciarUnRato(): void {
+  localStorage.setItem(CLAVE_SILENCIO, String(Date.now() + SILENCIO_TRAS_DESCARGAR))
 }

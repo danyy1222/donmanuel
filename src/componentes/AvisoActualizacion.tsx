@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   buscarActualizacion,
   posponer,
+  silenciarUnRato,
   VERSION_APP,
   type Actualizacion,
 } from '../lib/actualizaciones'
@@ -52,7 +53,9 @@ export function AvisoActualizacion({ activo }: { activo: boolean }) {
         <Boton
           onClick={() => {
             window.open(nueva.descarga, '_blank')
-            posponer(nueva.version)
+            // No se da por instalada: si la descarga se corta o la instalación
+            // se cancela, en unas horas vuelve a avisar.
+            silenciarUnRato()
             setNueva(null)
           }}
           className="w-full text-lg"
