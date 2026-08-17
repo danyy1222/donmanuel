@@ -6,48 +6,46 @@
 
 ## Cómo publicar una actualización
 
-Tres pasos, y el orden importa: el aviso tiene que salir cuando el archivo ya
-está disponible para descargar.
-
 **1. Subir el número de versión** en `package.json`:
 
 ```json
-"version": "1.2.0"
+"version": "1.2.2"
 ```
 
-**2. Generar el APK y publicarlo**
+**2. Generar el APK**
 
 ```bash
 npm run apk
 ```
 
-Subir `sistema-tienda.apk` a un **Release** en GitHub:
-`https://github.com/danyy1222/donmanuel/releases/new`
-Poner el mismo número de versión como etiqueta (por ejemplo `v1.2.0`) y
-adjuntar el archivo.
-
-**3. Recién ahora, avisar.** Editar `version.json` con el número nuevo y una
-línea contando qué cambió, y subirlo:
-
-```json
-{
-  "version": "1.2.0",
-  "novedades": "Ahora se puede anotar la merma de verduras.",
-  "descarga": "https://github.com/danyy1222/donmanuel/releases/latest"
-}
-```
+**3. Publicar**
 
 ```bash
-git add -A && git commit -m "Versión 1.2.0" && git push
+npm run publicar 1.2.2 "Ahora se puede anotar la merma de verduras."
 ```
 
-Los celulares lo ven en la próxima apertura de la app (revisa como mucho una
-vez por hora).
+Eso hace todo lo demás: crea el Release en GitHub, sube el APK, actualiza
+`version.json` con el enlace al archivo nuevo, lo commitea, hace push y purga
+el caché del CDN.
+
+Los celulares lo ven en la próxima apertura de la app, que revisa como mucho
+una vez por hora.
+
+### Por qué el script hace todo eso
+
+Cada paso está resolviendo un problema que apareció haciéndolo a mano:
+
+- **El aviso va último.** Publicarlo antes que el APK dejaría a los celulares
+  con un enlace de descarga que todavía no existe.
+- **El enlace apunta al archivo, no a la página del Release.** Desde el celular,
+  esa página obliga a bajar hasta "Assets" y elegir entre varios archivos.
+- **Se purga el caché de jsDelivr.** Sin eso el CDN sigue sirviendo la versión
+  anterior hasta doce horas y nadie se entera de la actualización.
+- **Se verifica que `package.json` coincida** con la versión que se publica. Si
+  no, el APK llevaría adentro el número viejo y la app se creería
+  desactualizada para siempre.
 
 ### Qué NO hacer
-
-**No subas `version.json` antes que el APK.** El aviso saldría con un enlace de
-descarga que todavía no existe.
 
 **No repitas un número de versión.** Si ya publicaste la `1.2.0` y le cambiás
 el contenido, los celulares que ya la vieron no se enteran: la comparación es

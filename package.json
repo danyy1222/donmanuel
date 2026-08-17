@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host",
     "apk": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/apk.ps1",
+    "publicar": "node scripts/publicar.mjs",
     "iconos": "node scripts/iconos.mjs && node scripts/iconos-android.mjs"
   },
   "dependencies": {
